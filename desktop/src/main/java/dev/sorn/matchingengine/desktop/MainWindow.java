@@ -13,7 +13,7 @@ public class MainWindow extends JFrame {
         super.setSize(P.X_MAX, P.Y_MAX);
         super.setMinimumSize(new Dimension(P.X_MAX, P.Y_MAX));
         super.setMaximumSize(new Dimension(P.X_MAX, P.Y_MAX));
-        final var commandBar = new CommandBar();
+        final var commandBar = new CommandBar(new CommandParser());
         super.add(commandBar);
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         super.setLocationRelativeTo(null);
