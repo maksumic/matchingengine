@@ -5,25 +5,25 @@ import java.util.Map;
 
 final class OrderBook {
     private final OrderFactory factory;
-    private final CurrencyPair currencyPair;
+    private final CurrencyPair pair;
     private final Map<Long, Order> orders;
     private final PriceBuckets bids;
     private final PriceBuckets asks;
 
-    public OrderBook(OrderFactory factory, CurrencyPair currencyPair) {
-        this(factory, currencyPair, new TreePriceBuckets(true), new TreePriceBuckets(false));
+    public OrderBook(OrderFactory factory, CurrencyPair pair) {
+        this(factory, pair, new TreePriceBuckets(true), new TreePriceBuckets(false));
     }
 
-    public OrderBook(OrderFactory factory, CurrencyPair currencyPair, PriceBuckets bids, PriceBuckets asks) {
+    public OrderBook(OrderFactory factory, CurrencyPair pair, PriceBuckets bids, PriceBuckets asks) {
         this.factory = factory;
-        this.currencyPair = currencyPair;
+        this.pair = pair;
         this.orders = new HashMap<>();
         this.bids = bids;
         this.asks = asks;
     }
 
     public CurrencyPair currencyPair() {
-        return currencyPair;
+        return pair;
     }
 
     public boolean insert(long id, CurrencyPair pair, OrderType type, OrderSide side, int quantity, long price, long timestamp) {
@@ -32,6 +32,11 @@ final class OrderBook {
         }
         final var order = factory.create(id, pair, type, side, quantity, price, timestamp);
         orders.put(id, order);
+        if (side == OrderSide.BUY) {
+            bids.add(order);
+        } else { // OrderSide.SELL
+            asks.add(order);
+        }
         // TODO: business logic
         return true;
     }
@@ -56,5 +61,13 @@ final class OrderBook {
         order.unlink();
         factory.recycle(order);
         return true;
+    }
+
+    public Order bestBid() {
+        return bids.best();
+    }
+
+    public Order bestAsk() {
+        return asks.best();
     }
 }

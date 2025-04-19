@@ -1,13 +1,35 @@
 package dev.sorn.matchingengine;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class OrderBookTest {
+    private static final Currency BTC = new Currency("BTC", 8);
+    private static final Currency USD = new Currency("USD", 2);
+    private static final CurrencyPair BTC_USD = new CurrencyPair(BTC, USD);
+    private static final OrderFactory ORDER_FACTORY = new PooledOrderFactory(100);
+
     @Nested
     class Insert {
         // <editor-fold desc="Buy orders">
-        @Test public void insert_buyOrder_returnsTrue_andUpdatesBestBid() {}
+        @Test
+        public void insert_buyOrder_returnsTrue_andUpdatesBestBid() {
+            final var book = new OrderBook(ORDER_FACTORY, BTC_USD);
+            Assertions.assertNull(book.bestBid());
+            final var inserted = book.insert(42, BTC_USD, OrderType.LIMIT, OrderSide.BUY, 100, 100_000_00, 1);
+            Assertions.assertTrue(inserted);
+            final var bestBid = book.bestBid();
+            Assertions.assertNotNull(bestBid, "bids were not updated");
+            Assertions.assertEquals(42, bestBid.id, "wrong best bid ID");
+            Assertions.assertEquals(BTC_USD, bestBid.pair);
+            Assertions.assertEquals(OrderType.LIMIT, bestBid.type);
+            Assertions.assertEquals(OrderSide.BUY, bestBid.side);
+            Assertions.assertEquals(100, bestBid.quantity);
+            Assertions.assertEquals(100_000_00, bestBid.price);
+            Assertions.assertEquals(1, bestBid.timestamp);
+        }
+
         @Test public void insert_buyOrderAtBetterPrice_returnsTrue_andRanksAheadOfRestingBuys() {}
         @Test public void insert_buyOrderCrossingAsk_returnsTrue_andPartiallyMatchesRestingSell_andRestsWithRemainingQuantity() {}
         @Test public void insert_buyOrderCrossingAsk_returnsTrue_andEmitsTradeEvent_withMatchedQuantityAndPrice() {}
@@ -16,7 +38,22 @@ public class OrderBookTest {
         // </editor-fold>
 
         // <editor-fold desc="Sell orders">
-        @Test public void insert_sellOrder_returnsTrue_andUpdatesBestAsk() {}
+        @Test public void insert_sellOrder_returnsTrue_andUpdatesBestAsk() {
+            final var book = new OrderBook(ORDER_FACTORY, BTC_USD);
+            Assertions.assertNull(book.bestAsk());
+            final var inserted = book.insert(42, BTC_USD, OrderType.LIMIT, OrderSide.SELL, 100, 100_000_00, 1);
+            Assertions.assertTrue(inserted);
+            final var bestAsk = book.bestAsk();
+            Assertions.assertNotNull(bestAsk, "asks were not updated");
+            Assertions.assertEquals(42, bestAsk.id, "wrong best ask ID");
+            Assertions.assertEquals(BTC_USD, bestAsk.pair);
+            Assertions.assertEquals(OrderType.LIMIT, bestAsk.type);
+            Assertions.assertEquals(OrderSide.SELL, bestAsk.side);
+            Assertions.assertEquals(100, bestAsk.quantity);
+            Assertions.assertEquals(100_000_00, bestAsk.price);
+            Assertions.assertEquals(1, bestAsk.timestamp);
+        }
+
         @Test public void insert_sellOrderAtBetterPrice_returnsTrue_andRanksAheadOfRestingSells() {}
         @Test public void insert_sellOrderCrossingBid_returnsTrue_andPartiallyMatchesRestingBuy_andRestsWithRemainingQuantity() {}
         @Test public void insert_sellOrderCrossingBid_returnsTrue_andEmitsTradeEvent_withMatchedQuantityAndPrice() {}

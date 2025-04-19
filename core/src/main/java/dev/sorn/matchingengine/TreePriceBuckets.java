@@ -23,18 +23,26 @@ class TreePriceBuckets implements PriceBuckets {
         return levels.get(price);
     }
 
+    /**
+     * Adds the order into its price level list, preserving price-time priority.
+     * If the level does not exist, it is created with this order as head.
+     */
     @Override
-    public void put(long price, Order head) {
+    public void add(Order order) {
+        final long price = order.price;
+        final Order head = levels.get(price);
         if (head == null) {
-            levels.remove(price);
+            levels.put(price, order);
         } else {
-            levels.put(price, head);
+            // Traverse to tail and link
+            OrderCursor cursor = new OrderCursor(head);
+            Order tail = null;
+            while (cursor.hasNext()) {
+                tail = cursor.next();
+            }
+            tail.next = order;
+            order.prev = tail;
         }
-    }
-
-    @Override
-    public void remove(long price) {
-        levels.remove(price);
     }
 
     @Override
