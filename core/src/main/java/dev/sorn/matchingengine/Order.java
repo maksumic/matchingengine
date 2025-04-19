@@ -38,8 +38,25 @@ class Order {
     public long timestamp;
 
     // Intrusive pointers (used internally by OrderBook)
-    Order next;
     Order prev;
+    Order next;
+
+    public Order() {
+        // No-args constructor
+    }
+
+    public Order(long id, CurrencyPair pair, OrderType type, OrderSide side, int quantity, long price, long timestamp, Order prev, Order next) {
+        // All-args constructor
+        this.id = id;
+        this.pair = pair;
+        this.type = type;
+        this.side = side;
+        this.quantity = quantity;
+        this.price = price;
+        this.timestamp = timestamp;
+        this.prev = prev;
+        this.next = next;
+    }
 
     public void clear() {
         this.id = 0;
@@ -49,8 +66,8 @@ class Order {
         this.quantity = 0;
         this.price = 0;
         this.timestamp = 0;
-        this.next = null;
         this.prev = null;
+        this.next = null;
     }
 
     @Override
