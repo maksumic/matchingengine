@@ -6,11 +6,13 @@ import java.util.Set;
 
 public class MatchingEngine {
     private final Map<CurrencyPair, OrderBook> books;
+    private final OrderFactory orderFactory;
 
     public MatchingEngine(Set<CurrencyPair> supportedCurrencyPairs) {
         this.books = new HashMap<>();
+        this.orderFactory = new PooledOrderFactory(100_000);
         for (CurrencyPair pair : supportedCurrencyPairs) {
-            books.put(pair, new OrderBook(pair));
+            books.put(pair, new OrderBook(orderFactory, pair));
         }
     }
 

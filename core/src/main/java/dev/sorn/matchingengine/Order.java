@@ -70,6 +70,17 @@ class Order {
         this.next = null;
     }
 
+    public void unlink() {
+        if (this.prev != null) {
+            this.prev.next = next;
+        }
+        if (this.next != null) {
+            this.next.prev = prev;
+        }
+        this.prev = null;
+        this.next = null;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
