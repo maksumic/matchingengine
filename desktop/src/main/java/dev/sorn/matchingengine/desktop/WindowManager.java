@@ -60,18 +60,35 @@ public class WindowManager {
     }
 
     private void layoutPanels() {
-        int cols = 2;
-        int rows = 2;
+        int count = views.size();
+        int width = window.getWidth();
+        int height = window.getHeight() - P.Y32 * 2; // exclude command bar
         int index = 0;
-        int availableW = window.getWidth();
-        int availableH = window.getHeight();
-        int w = availableW / cols;
-        int h = availableH / rows - P.Y16;
         for (final var panel : views.values()) {
-            int col = index % cols;
-            int row = index / cols;
-            int x = col * w;
-            int y = row * h;
+            int x = 0, y = 0, w = width, h = height;
+            switch (count) {
+                case 1 -> {
+                    // Full screen
+                    x = 0;
+                    y = P.Y32;
+                    w = width;
+                    h = height;
+                }
+                case 2 -> {
+                    // Horizontal split
+                    w = width / 2;
+                    h = height;
+                    x = index * w;
+                    y = P.Y32;
+                }
+                case 3, 4 -> {
+                    // 2x2 grid
+                    w = width / 2;
+                    h = height / 2;
+                    x = (index % 2) * w;
+                    y = P.Y32 + (index / 2) * h;
+                }
+            }
             panel.setBounds(x, y, w, h);
             index++;
         }
