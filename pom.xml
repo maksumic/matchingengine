@@ -38,6 +38,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>core</module>
+        <module>desktop</module>
     </modules>
     <dependencies>
         <dependency>
