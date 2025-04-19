@@ -13,9 +13,20 @@ public class WindowManager {
     private static final int MAX_WINDOWS = 4;
     private final Window window;
     private final Map<CurrencyPair, JPanel> views = new LinkedHashMap<>();
+    private CurrencyPair selected = null;
 
     public WindowManager(Window window) {
         this.window = window;
+    }
+
+    public CommandResult select(CurrencyPair pair) {
+        if (!views.containsKey(pair)) {
+            return new CommandResult(false, "select: " + pair + " is not visible");
+        }
+        selected = pair;
+        layoutPanels();
+        window.repaint();
+        return new CommandResult(true, "select: " + pair);
     }
 
     public CommandResult show(CurrencyPair pair) {
@@ -27,6 +38,7 @@ public class WindowManager {
         }
         final var panel = createPanel(pair);
         views.put(pair, panel);
+        selected = pair;
         layoutPanels();
         window.add(panel);
         window.repaint();
@@ -39,6 +51,9 @@ public class WindowManager {
         }
         final var panel = views.remove(pair);
         window.remove(panel);
+        if (pair.equals(selected)) {
+            selected = views.keySet().stream().findFirst().orElse(null);
+        }
         layoutPanels();
         window.repaint();
         return new CommandResult(true, "hide: " + pair);
@@ -64,7 +79,9 @@ public class WindowManager {
         int width = window.getWidth();
         int height = window.getHeight() - P.Y32 * 2; // exclude command bar
         int index = 0;
-        for (final var panel : views.values()) {
+        for (final var e : views.entrySet()) {
+            var pair = e.getKey();
+            var panel = e.getValue();
             int x = 0, y = 0, w = width, h = height;
             switch (count) {
                 case 1 -> {
@@ -88,6 +105,16 @@ public class WindowManager {
                     x = (index % 2) * w;
                     y = P.Y32 + (index / 2) * h;
                 }
+            }
+            final var border = BorderFactory.createTitledBorder(pair.toString());
+            if (pair.equals(selected)) {
+                border.setTitleColor(Color.WHITE);
+                border.setTitleFont(Font.MONO_BOLD_12);
+                panel.setBorder(border);
+            } else {
+                border.setTitleColor(Color.GRAY_DARK);
+                border.setTitleFont(Font.MONO_PLAIN_12);
+                panel.setBorder(border);
             }
             panel.setBounds(x, y, w, h);
             index++;
