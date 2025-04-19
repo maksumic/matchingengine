@@ -17,6 +17,7 @@ public final class CommandBar extends JTextField {
         super.setCaretColor(Color.WHITE);
         super.setFont(Font.TEXT_PRIMARY);
         super.setEditable(false);
+        super.setLocation(0, P.Y_MAX - P.Y32);
         super.setSize(P.X_MAX, P.Y32);
         super.setFocusable(true);
         super.setRequestFocusEnabled(true);
@@ -61,7 +62,7 @@ public final class CommandBar extends JTextField {
         }
         this.setEditable(false);
         this.getCaret().setBlinkRate(0);
-        this.write("Exited command mode.");
+        this.write("exited command mode");
         commandMode = false;
     }
 
