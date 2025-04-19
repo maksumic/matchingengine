@@ -29,12 +29,38 @@ public class WindowManager {
         return new CommandResult(true, "select: " + pair);
     }
 
+    public CommandResult swap(CurrencyPair a, CurrencyPair b) {
+        if (!views.containsKey(a) || !views.containsKey(b)) {
+            return new CommandResult(false, "swap: both pairs must be visible");
+        }
+        if (a == b) {
+            return new CommandResult(false, "swap: pairs must be different");
+        }
+        final var newViews = new LinkedHashMap<CurrencyPair, JPanel>();
+        for (final var e : views.entrySet()) {
+            final var key = e.getKey();
+            final var panel = e.getValue();
+            if (key.equals(a)) {
+                newViews.put(b, views.get(b));
+            } else if (key.equals(b)) {
+                newViews.put(a, views.get(a));
+            } else {
+                newViews.put(key, panel);
+            }
+        }
+        views.clear();
+        views.putAll(newViews);
+        layoutPanels();
+        window.repaint();
+        return new CommandResult(true, "swap: " + a + " ⇄ " + b);
+    }
+
     public CommandResult show(CurrencyPair pair) {
         if (views.containsKey(pair)) {
             return new CommandResult(false, "show: " + pair + " is already visible");
         }
         if (views.size() == MAX_WINDOWS) {
-            return new CommandResult(false, "show: maximum of 4 order books reached");
+            return new CommandResult(false, "show: maximum of 4 pairs reached");
         }
         final var panel = createPanel(pair);
         views.put(pair, panel);
@@ -80,8 +106,8 @@ public class WindowManager {
         int height = window.getHeight() - P.Y32 * 2; // exclude command bar
         int index = 0;
         for (final var e : views.entrySet()) {
-            var pair = e.getKey();
-            var panel = e.getValue();
+            final var pair = e.getKey();
+            final var panel = e.getValue();
             int x = 0, y = 0, w = width, h = height;
             switch (count) {
                 case 1 -> {

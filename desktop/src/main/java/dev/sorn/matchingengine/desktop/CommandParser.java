@@ -23,6 +23,9 @@ public final class CommandParser {
         if (input.startsWith("select")) {
             return parseSelect(input);
         }
+        if (input.startsWith("swap")) {
+            return parseSwap(input);
+        }
         if (input.startsWith("show")) {
             return parseShow(input);
         }
@@ -32,12 +35,12 @@ public final class CommandParser {
         return error("unrecognized command: " + input);
     }
 
-    private Command error(String input) {
-        return () -> new CommandResult(false, input);
-    }
-
     private Command parseSelect(String input) {
         return parseCurrencyPair(manager::select, input);
+    }
+
+    private Command parseSwap(String input) {
+        return parseDoublePair(input, pairs -> () -> manager.swap(pairs[0], pairs[1]));
     }
 
     private Command parseShow(String input) {
@@ -49,28 +52,48 @@ public final class CommandParser {
     }
 
     private Command parseCurrencyPair(Function<CurrencyPair, CommandResult> f, String input) {
-        final var prefix = "show: ";
-        final var parts1 = input.split(" ");
-        if (parts1.length != 2) {
-            return error(prefix + "expects a currency pair, e.g., BTC/USD");
+        return parseSinglePair(input, pair -> () -> f.apply(pair));
+    }
+
+    private Command parseSinglePair(String input, Function<CurrencyPair, Command> onValid) {
+        final var parts = input.trim().split(" ");
+        if (parts.length != 2) {
+            return error("expects a currency pair, e.g., BTC/USD");
         }
-        final var parts2 = parts1[1].split("/");
-        if (parts2.length != 2) {
-            return error(prefix + "expects a currency pair, e.g., BTC/USD");
+        final var pair = toPair(parts[1]);
+        if (pair == null) {
+            return error("invalid currency pair: " + parts[1]);
         }
-        final var base = CurrencyCache.get(parts2[0].toUpperCase());
-        if (base == null) {
-            return error(prefix + "invalid base currency: " + parts2[0]);
+        return onValid.apply(pair);
+    }
+
+    private Command parseDoublePair(String input, Function<CurrencyPair[], Command> onValid) {
+        final var parts = input.trim().split(" ");
+        if (parts.length != 3) {
+            return error("expects two currency pairs, e.g., swap BTC/USD ETH/USD");
         }
-        final var quote = CurrencyCache.get(parts2[1].toUpperCase());
-        if (quote == null) {
-            return error(prefix + "invalid quote currency: " + parts2[1]);
+        final var pair1 = toPair(parts[1]);
+        final var pair2 = toPair(parts[2]);
+        if (pair1 == null || pair2 == null) {
+            return error("invalid currency pair(s): " + parts[1] + " " + parts[2]);
         }
+        return onValid.apply(new CurrencyPair[]{pair1, pair2});
+    }
+
+    private CurrencyPair toPair(String symbol) {
+        final var parts = symbol.split("/");
+        if (parts.length != 2) return null;
+        final var base = CurrencyCache.get(parts[0].toUpperCase());
+        final var quote = CurrencyCache.get(parts[1].toUpperCase());
+        if (base == null || quote == null) return null;
         try {
-            final var pair = new CurrencyPair(base, quote);
-            return () -> f.apply(pair);
+            return new CurrencyPair(base, quote);
         } catch (IllegalArgumentException e) {
-            return error(prefix + "invalid currency pair");
+            return null;
         }
+    }
+
+    private Command error(String input) {
+        return () -> new CommandResult(false, input);
     }
 }
