@@ -1,6 +1,6 @@
 package dev.sorn.matchingengine;
 
-enum OrderType {
+public enum OrderType {
     LIMIT,
     MARKET,
 }

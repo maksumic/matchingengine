@@ -1,6 +1,6 @@
 package dev.sorn.matchingengine;
 
-class Order {
+public class Order {
     /**
      * Globally unique identifier, used to reference the order during amends and
      * pulls.
@@ -38,8 +38,8 @@ class Order {
     public long timestamp;
 
     // Intrusive pointers (used internally by OrderBook)
-    Order prev;
-    Order next;
+    public Order prev;
+    public Order next;
 
     public Order() {
         // No-args constructor

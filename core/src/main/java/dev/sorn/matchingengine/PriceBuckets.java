@@ -6,7 +6,7 @@ package dev.sorn.matchingengine;
  * <p>
  * Used internally by {@link OrderBook} to manage one side of the book (bids or asks).
  */
-interface PriceBuckets {
+public interface PriceBuckets {
     /**
      * Returns the head order at the specified price level.
      *
@@ -30,4 +30,7 @@ interface PriceBuckets {
      * @return the best price level’s head {@link Order}, or {@code null} if none exist
      */
     Order best();
+
+    boolean isAscending();
+    boolean isDescending();
 }

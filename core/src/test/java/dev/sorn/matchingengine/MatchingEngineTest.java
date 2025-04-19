@@ -49,14 +49,14 @@ public class MatchingEngineTest {
     }
 
     @Nested
-    class ViewOf {
-        @Test public void viewOf_returnsImmutableView_andExternalModificationThrowsException() {}
+    class Get {
+        @Test public void get_returnsImmutableView_andExternalModificationThrowsException() {}
 
         @Test
-        public void viewOf_unknownCurrencyPair_throwsIllegalArgumentException() {
+        public void get_unknownCurrencyPair_throwsIllegalArgumentException() {
             final var currencyPair = new CurrencyPair(new Currency("BTC", 8), new Currency("USD", 2));
             final var engine = new MatchingEngine(Set.of());
-            final var e = Assertions.assertThrows(IllegalArgumentException.class, () -> engine.viewOf(currencyPair));
+            final var e = Assertions.assertThrows(IllegalArgumentException.class, () -> engine.get(currencyPair));
             Assertions.assertEquals("Unsupported currency pair: " + currencyPair, e.getMessage());
         }
     }

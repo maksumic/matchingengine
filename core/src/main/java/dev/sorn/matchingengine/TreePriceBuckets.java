@@ -6,7 +6,8 @@ import java.util.TreeMap;
 /**
  * TreeMap-backed implementation of {@link PriceBuckets}.
  */
-class TreePriceBuckets implements PriceBuckets {
+public class TreePriceBuckets implements PriceBuckets {
+    private final boolean descending;
     private final NavigableMap<Long, Order> levels;
 
     /**
@@ -15,6 +16,7 @@ class TreePriceBuckets implements PriceBuckets {
      * @param descending true for bids (highest price first), false for asks
      */
     TreePriceBuckets(boolean descending) {
+        this.descending = descending;
         this.levels = new TreeMap<>(descending ? (a, b) -> Long.compare(b, a) : Long::compare);
     }
 
@@ -48,5 +50,15 @@ class TreePriceBuckets implements PriceBuckets {
     @Override
     public Order best() {
         return levels.isEmpty() ? null : levels.firstEntry().getValue();
+    }
+
+    @Override
+    public boolean isAscending() {
+        return !descending;
+    }
+
+    @Override
+    public boolean isDescending() {
+        return descending;
     }
 }

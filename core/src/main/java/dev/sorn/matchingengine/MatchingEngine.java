@@ -16,12 +16,11 @@ public class MatchingEngine {
         }
     }
 
-    public OrderBook viewOf(CurrencyPair currencyPair) {
+    public OrderBook get(CurrencyPair currencyPair) {
         OrderBook book = books.get(currencyPair);
         if (book == null) {
             throw new IllegalArgumentException("Unsupported currency pair: " + currencyPair);
         }
-        // TODO: return immutable book (view)
         return book;
     }
 }

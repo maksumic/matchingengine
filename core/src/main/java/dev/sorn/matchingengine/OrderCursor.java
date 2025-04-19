@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 /**
  * Read-only forward cursor for intrusive order chains.
  */
-final class OrderCursor implements Iterator<Order> {
+public final class OrderCursor implements Iterator<Order> {
     private Order current;
 
     public OrderCursor(Order head) {

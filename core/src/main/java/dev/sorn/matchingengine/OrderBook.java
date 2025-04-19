@@ -3,7 +3,7 @@ package dev.sorn.matchingengine;
 import java.util.HashMap;
 import java.util.Map;
 
-final class OrderBook {
+public final class OrderBook {
     private final OrderFactory factory;
     private final CurrencyPair pair;
     private final Map<Long, Order> orders;
@@ -22,7 +22,7 @@ final class OrderBook {
         this.asks = asks;
     }
 
-    public CurrencyPair currencyPair() {
+    public CurrencyPair pair() {
         return pair;
     }
 
@@ -69,5 +69,13 @@ final class OrderBook {
 
     public Order bestAsk() {
         return asks.best();
+    }
+
+    public PriceBuckets bids() {
+        return bids;
+    }
+
+    public PriceBuckets asks() {
+        return asks;
     }
 }

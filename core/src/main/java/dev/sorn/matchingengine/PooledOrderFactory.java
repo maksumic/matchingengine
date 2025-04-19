@@ -1,6 +1,6 @@
 package dev.sorn.matchingengine;
 
-class PooledOrderFactory implements OrderFactory {
+public class PooledOrderFactory implements OrderFactory {
     private final ObjectPool<Order> pool;
 
     public PooledOrderFactory(int capacity) {

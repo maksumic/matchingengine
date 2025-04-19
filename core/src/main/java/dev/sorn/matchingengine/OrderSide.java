@@ -1,6 +1,6 @@
 package dev.sorn.matchingengine;
 
-enum OrderSide {
+public enum OrderSide {
     BUY,
     SELL,
 }
