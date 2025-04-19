@@ -1,7 +1,10 @@
 package dev.sorn.matchingengine;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.util.Set;
 
 public class MatchingEngineTest {
     @Nested
@@ -43,5 +46,18 @@ public class MatchingEngineTest {
         @Test public void pull_sameOrderTwice_returnsFalse_andDoesNotMutateBook() {}
         @Test public void pull_beforeInsert_returnsFalse_andDoesNotMutateBook() {}
         // </editor-fold>
+    }
+
+    @Nested
+    class ViewOf {
+        @Test public void viewOf_returnsImmutableView_andExternalModificationThrowsException() {}
+
+        @Test
+        public void viewOf_unknownCurrencyPair_throwsIllegalArgumentException() {
+            final var currencyPair = new CurrencyPair(new Currency("BTC", 8), new Currency("USD", 2));
+            final var engine = new MatchingEngine(Set.of());
+            final var e = Assertions.assertThrows(IllegalArgumentException.class, () -> engine.viewOf(currencyPair));
+            Assertions.assertEquals("Unsupported currency pair: " + currencyPair, e.getMessage());
+        }
     }
 }
